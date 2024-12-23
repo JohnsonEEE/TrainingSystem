@@ -541,3 +541,18 @@ create table sys_logininfor (
   key idx_sys_logininfor_lt (login_time)
 ) engine=innodb auto_increment=100 comment = '系统访问记录';
 
+-- ----------------------------
+-- 100、培训课程表
+-- ----------------------------
+drop table if exists training_class;
+create table training_class (
+                                class_id bigint(20) not null comment '课程id，主键',
+                                class_name varchar(100) default null comment '课程名称',
+                                class_name_py varchar(100) default null comment '课程名称拼音',
+                                class_begin_time datetime default null comment '课程开始时间',
+                                location varchar(200) default null comment '上课地点',
+                                teacher_name varchar(100) default null comment '老师姓名',
+                                content text default null comment '课程内容',
+                                status varchar(100) default null comment '课程状态',
+                                primary key (class_id)
+) engine=innodb auto_increment=100 comment = '培训课程表';

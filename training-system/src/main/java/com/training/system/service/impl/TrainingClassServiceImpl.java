@@ -31,68 +31,29 @@
  *
  * Copyright version 2.0
  */
-package com.training.common.core.domain.entity;
+package com.training.system.service.impl;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import com.training.system.domain.TrainingClassVO;
+import com.training.system.mapper.TrainingClassMapper;
+import com.training.system.service.ITrainingClassService;
+import org.springframework.stereotype.Service;
 
-import javax.persistence.Id;
-import java.time.LocalDateTime;
-
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
- * 培训课程
- *
  * @author training
  * @date 2024.12.23
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-public class TrainingClass {
+@Service
+public class TrainingClassServiceImpl implements ITrainingClassService {
 
-    private static final long serialVersionUID = 127680739397547918L;
+    @Resource
+    private TrainingClassMapper trainingClassMapper;
 
-    /**
-     * 课程id，主键
-     */
-    @Id
-    private Long classId;
-
-    /**
-     * 课程名称
-     */
-    private String className;
-
-    /**
-     * 课程名称拼音
-     */
-    private String classNamePY;
-
-    /**
-     * 课程开始时间
-     */
-    private LocalDateTime classBeginTime;
-
-    /**
-     * 上课地点
-     */
-    private String location;
-
-    /**
-     * 老师姓名
-     */
-    private String teacherName;
-
-    /**
-     * 课程内容
-     */
-    private String content;
-
-    /**
-     * 课程状态
-     * 状态可以查看枚举 com.training.common.enums.TrainingClassStatusEnum
-     */
-    private String status;
+    @Override
+    public List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO) {
+        List<TrainingClassVO> trainingClassVOS = trainingClassMapper.selectClassList(trainingClassVO);
+        return trainingClassVOS;
+    }
 }

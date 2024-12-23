@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.mapper.TrainingClassMapper">
+
+	<select id="selectClassList"
+            parameterType="com.training.system.domain.TrainingClassVO"
+            resultType="com.training.system.domain.TrainingClassVO">
+	    select class_id AS classId, class_name AS className, class_name_py AS classNamePy,
+	           class_begin_time AS classBeginTime, location, teacher_name AS teacherName, content, status
+	    from training_class
+        <where>
+            <if test="className!=null and className!=''">
+                AND (lower(class_name) like '%' || lower(#{className}) || '%'
+                OR lower(class_name_py) like '%' || lower(#{className}) || '%')
+            </if>
+            <if test="queryBeginTime!=null">
+                AND class_begin_time <![CDATA[>=]]> #{queryBeginTime}
+            </if>
+            <if test="queryEndTime!=null">
+                AND class_begin_time <![CDATA[<=>]]> #{queryEndTime}
+            </if>
+            <if test="teacherName!=null and teacherName!=''">
+                AND lower(teacher_name) like '%' || lower(#{teacherName}) || '%'
+            </if>
+        </where>
+	</select>
+	
+</mapper>

@@ -9,7 +9,6 @@ import com.training.common.enums.CacheType;
 import com.training.common.utils.sign.Base64;
 import com.training.common.utils.uuid.IdUtils;
 import com.training.system.service.ISysConfigService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +36,8 @@ public class CaptchaController
     @Resource
     private MyCache myCache;
     
-    @Autowired
-    private ISysConfigService configService;
+    @Resource
+    private ISysConfigService sysConfigService;
     /**
      * 生成验证码
      */
@@ -46,7 +45,7 @@ public class CaptchaController
     public AjaxResult getCode(HttpServletResponse response) throws IOException
     {
         AjaxResult ajax = AjaxResult.success();
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
+        boolean captchaEnabled = sysConfigService.selectCaptchaEnabled();
         ajax.put("captchaEnabled", captchaEnabled);
         if (!captchaEnabled)
         {

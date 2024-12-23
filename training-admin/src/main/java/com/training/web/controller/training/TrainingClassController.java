@@ -31,68 +31,30 @@
  *
  * Copyright version 2.0
  */
-package com.training.common.core.domain.entity;
+package com.training.web.controller.training;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import com.training.common.core.controller.BaseController;
+import com.training.common.core.domain.AjaxResult;
+import com.training.system.domain.TrainingClassVO;
+import com.training.system.service.ITrainingClassService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.Id;
-import java.time.LocalDateTime;
-
+import javax.annotation.Resource;
 
 /**
- * 培训课程
- *
  * @author training
  * @date 2024.12.23
  */
-@Getter
-@Setter
-@Accessors(chain = true)
-public class TrainingClass {
+@RestController
+@RequestMapping("/training")
+public class TrainingClassController extends BaseController {
+    @Resource
+    private ITrainingClassService trainingClassService;
 
-    private static final long serialVersionUID = 127680739397547918L;
-
-    /**
-     * 课程id，主键
-     */
-    @Id
-    private Long classId;
-
-    /**
-     * 课程名称
-     */
-    private String className;
-
-    /**
-     * 课程名称拼音
-     */
-    private String classNamePY;
-
-    /**
-     * 课程开始时间
-     */
-    private LocalDateTime classBeginTime;
-
-    /**
-     * 上课地点
-     */
-    private String location;
-
-    /**
-     * 老师姓名
-     */
-    private String teacherName;
-
-    /**
-     * 课程内容
-     */
-    private String content;
-
-    /**
-     * 课程状态
-     * 状态可以查看枚举 com.training.common.enums.TrainingClassStatusEnum
-     */
-    private String status;
+    @RequestMapping("/classList")
+    public AjaxResult classList(TrainingClassVO trainingClassVO)
+    {
+        return AjaxResult.success(trainingClassService.selectClassList(trainingClassVO));
+    }
 }

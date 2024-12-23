@@ -31,33 +31,31 @@
  *
  * Copyright version 2.0
  */
-package com.training.common.core.domain.entity;
+package com.training.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.training.common.constant.Constants;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Id;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-
 /**
- * 培训课程
- *
  * @author training
  * @date 2024.12.23
  */
 @Getter
 @Setter
 @Accessors(chain = true)
-public class TrainingClass {
+public class TrainingClassVO implements Serializable {
 
-    private static final long serialVersionUID = 127680739397547918L;
+    private static final long serialVersionUID = 7182475451240734022L;
 
     /**
      * 课程id，主键
      */
-    @Id
     private Long classId;
 
     /**
@@ -73,6 +71,7 @@ public class TrainingClass {
     /**
      * 课程开始时间
      */
+    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
     private LocalDateTime classBeginTime;
 
     /**
@@ -95,4 +94,16 @@ public class TrainingClass {
      * 状态可以查看枚举 com.training.common.enums.TrainingClassStatusEnum
      */
     private String status;
+
+    /**
+     * 查询条件开始时间
+     */
+    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+    private LocalDateTime queryBeginTime;
+
+    /**
+     * 查询条件结束时间
+     */
+    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+    private LocalDateTime queryEndTime;
 }

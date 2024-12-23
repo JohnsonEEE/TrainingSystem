@@ -1,7 +1,8 @@
 package com.training.common.constant;
 
-import java.util.Locale;
 import io.jsonwebtoken.Claims;
+
+import java.util.Locale;
 
 /**
  * 通用常量信息
@@ -159,4 +160,15 @@ public class Constants
      * 自动识别json对象白名单配置（仅允许解析的包名，范围越小越安全）
      */
     public static final String[] JSON_WHITELIST_STR = { "org.springframework", "com.training" };
+
+    /**
+     * 默认日期时间格式 yyyy-MM-dd HH:mm:ss
+     */
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+
+    /**
+     * 日期格式 yyyy-MM-dd
+     */
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
 }

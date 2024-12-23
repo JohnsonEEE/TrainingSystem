@@ -31,68 +31,32 @@
  *
  * Copyright version 2.0
  */
-package com.training.common.core.domain.entity;
+package com.training.common.enums;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
-import javax.persistence.Id;
-import java.time.LocalDateTime;
-
 
 /**
- * 培训课程
+ * 课程状态枚举
  *
  * @author training
  * @date 2024.12.23
  */
 @Getter
-@Setter
-@Accessors(chain = true)
-public class TrainingClass {
-
-    private static final long serialVersionUID = 127680739397547918L;
-
-    /**
-     * 课程id，主键
-     */
-    @Id
-    private Long classId;
+@AllArgsConstructor
+public enum TrainingClassStatusEnum {
+    NOT_BEGIN("0", "未开始"),
+    DOING_CLASS("1", "进行中"),
+    COMPLETE("2", "已完成"),
+    CANCEL("3", "已取消");
 
     /**
-     * 课程名称
+     * 编码
      */
-    private String className;
+    private String code;
 
     /**
-     * 课程名称拼音
+     * 名称
      */
-    private String classNamePY;
-
-    /**
-     * 课程开始时间
-     */
-    private LocalDateTime classBeginTime;
-
-    /**
-     * 上课地点
-     */
-    private String location;
-
-    /**
-     * 老师姓名
-     */
-    private String teacherName;
-
-    /**
-     * 课程内容
-     */
-    private String content;
-
-    /**
-     * 课程状态
-     * 状态可以查看枚举 com.training.common.enums.TrainingClassStatusEnum
-     */
-    private String status;
+    private String name;
 }

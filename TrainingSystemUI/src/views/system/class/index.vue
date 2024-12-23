@@ -23,7 +23,7 @@
           style="width: 200px"
         >
           <el-option
-            v-for="dict in sys_normal_disable"
+            v-for="dict in training_class_status"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -49,11 +49,6 @@
           >新增</el-button
         >
       </el-col>
-      <el-col :span="1.5">
-        <el-button type="info" plain icon="Sort" @click="toggleExpandAll"
-          >展开/折叠</el-button
-        >
-      </el-col>
       <right-toolbar
         v-model:showSearch="showSearch"
         @queryTable="getList"
@@ -63,33 +58,36 @@
     <el-table
       v-if="refreshTable"
       v-loading="loading"
-      :data="deptList"
-      row-key="deptId"
+      :data="classList"
+      row-key="classId"
       :default-expand-all="isExpandAll"
     >
       <el-table-column
-        prop="deptName"
-        label="部门名称"
-        width="260"
-      ></el-table-column>
-      <el-table-column
-        prop="orderNum"
-        label="排序"
+        prop="className"
+        label="课程名称"
         width="200"
       ></el-table-column>
-      <el-table-column prop="status" label="状态" width="100">
+      <el-table-column
+        prop="teacherName"
+        label="老师"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        prop="location"
+        label="上课地点"
+        width="200"
+      ></el-table-column>
+      <el-table-column prop="classBeginTime" label="课程开始时间" width="200">
         <template #default="scope">
-          <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
+          <span>{{ parseTime(scope.row.classBeginTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="200"
-      >
+      <el-table-column prop="status" label="课程状态" width="100">
         <template #default="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
+          <dict-tag
+            :options="training_class_status"
+            :value="scope.row.status"
+          />
         </template>
       </el-table-column>
       <el-table-column
@@ -137,11 +135,11 @@
                 v-model="form.parentId"
                 :data="deptOptions"
                 :props="{
-                  value: 'deptId',
+                  value: 'classId',
                   label: 'deptName',
                   children: 'children',
                 }"
-                value-key="deptId"
+                value-key="classId"
                 placeholder="选择上级部门"
                 check-strictly
               />
@@ -192,7 +190,7 @@
             <el-form-item label="部门状态">
               <el-radio-group v-model="form.status">
                 <el-radio
-                  v-for="dict in sys_normal_disable"
+                  v-for="dict in training_class_status"
                   :key="dict.value"
                   :value="dict.value"
                   >{{ dict.label }}</el-radio
@@ -212,20 +210,13 @@
   </div>
 </template>
 
-<script setup name="Dept">
-import {
-  listDept,
-  getDept,
-  delDept,
-  addDept,
-  updateDept,
-  listDeptExcludeChild,
-} from "@/api/system/dept";
+<script setup name="Class">
+import {listClass} from "@/api/system/class";
 
 const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
+const { training_class_status } = proxy.useDict("training_class_status");
 
-const deptList = ref([]);
+const classList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -269,11 +260,11 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询部门列表 */
+/** 查询课程列表 */
 function getList() {
   loading.value = true;
-  listDept(queryParams.value).then((response) => {
-    deptList.value = proxy.handleTree(response.data, "deptId");
+  listClass(queryParams.value).then((response) => {
+    classList.value = response.data;
     loading.value = false;
   });
 }
@@ -287,7 +278,7 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
-    deptId: undefined,
+    classId: undefined,
     parentId: undefined,
     deptName: undefined,
     orderNum: 0,
@@ -314,10 +305,10 @@ function resetQuery() {
 function handleAdd(row) {
   reset();
   listDept().then((response) => {
-    deptOptions.value = proxy.handleTree(response.data, "deptId");
+    deptOptions.value = proxy.handleTree(response.data, "classId");
   });
   if (row != undefined) {
-    form.value.parentId = row.deptId;
+    form.value.parentId = row.classId;
   }
   open.value = true;
   title.value = "添加部门";
@@ -335,10 +326,10 @@ function toggleExpandAll() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  listDeptExcludeChild(row.deptId).then((response) => {
-    deptOptions.value = proxy.handleTree(response.data, "deptId");
+  listDeptExcludeChild(row.classId).then((response) => {
+    deptOptions.value = proxy.handleTree(response.data, "classId");
   });
-  getDept(row.deptId).then((response) => {
+  getDept(row.classId).then((response) => {
     form.value = response.data;
     open.value = true;
     title.value = "修改部门";
@@ -349,7 +340,7 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["deptRef"].validate((valid) => {
     if (valid) {
-      if (form.value.deptId != undefined) {
+      if (form.value.classId != undefined) {
         updateDept(form.value).then((response) => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
@@ -371,7 +362,7 @@ function handleDelete(row) {
   proxy.$modal
     .confirm('是否确认删除名称为"' + row.deptName + '"的数据项?')
     .then(function () {
-      return delDept(row.deptId);
+      return delDept(row.classId);
     })
     .then(() => {
       getList();
