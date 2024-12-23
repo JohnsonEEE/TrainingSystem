@@ -43,4 +43,12 @@ import java.util.List;
  */
 public interface ITrainingClassService {
     List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO);
+
+    void addClass(TrainingClassVO trainingClassVO);
+
+    void delClass(String classId);
+
+    TrainingClassVO getTrainingClass(String classId);
+
+    void updateClass(TrainingClassVO trainingClassVO);
 }

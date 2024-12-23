@@ -142,6 +142,18 @@
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-spring-boot-starter</artifactId>
         </dependency>
+
+        <!-- hutool工具 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+
+        <!-- 拼音 -->
+        <dependency>
+            <groupId>io.github.biezhi</groupId>
+            <artifactId>TinyPinyin</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

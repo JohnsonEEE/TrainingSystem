@@ -6,10 +6,10 @@
       :inline="true"
       v-show="showSearch"
     >
-      <el-form-item label="部门名称" prop="deptName">
+      <el-form-item label="课程名称" prop="className">
         <el-input
-          v-model="queryParams.deptName"
-          placeholder="请输入部门名称"
+          v-model="queryParams.className"
+          placeholder="请输入课程名称"
           clearable
           style="width: 200px"
           @keyup.enter="handleQuery"
@@ -18,7 +18,7 @@
       <el-form-item label="状态" prop="status">
         <el-select
           v-model="queryParams.status"
-          placeholder="部门状态"
+          placeholder="课程状态"
           clearable
           style="width: 200px"
         >
@@ -62,6 +62,7 @@
       row-key="classId"
       :default-expand-all="isExpandAll"
     >
+      <el-table-column type="index" label="序号" width="50" />
       <el-table-column
         prop="className"
         label="课程名称"
@@ -69,7 +70,7 @@
       ></el-table-column>
       <el-table-column
         prop="teacherName"
-        label="老师"
+        label="讲师"
         width="100"
       ></el-table-column>
       <el-table-column
@@ -100,6 +101,14 @@
             link
             type="primary"
             icon="Edit"
+            @click="handleUpdateStatus(scope.row)"
+            v-hasPermi="['system:dept:edit']"
+            >改变状态</el-button
+          >
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:dept:edit']"
             >修改</el-button
@@ -108,13 +117,14 @@
             link
             type="primary"
             icon="Plus"
-            @click="handleAdd(scope.row)"
+            @click="handleAdd()"
             v-hasPermi="['system:dept:add']"
             >新增</el-button
           >
           <el-button
             v-if="scope.row.parentId != 0"
             link
+            style="color: red"
             type="primary"
             icon="Delete"
             @click="handleDelete(scope.row)"
@@ -125,77 +135,54 @@
       </el-table-column>
     </el-table>
 
-    <!-- 添加或修改部门对话框 -->
+    <!-- 添加或修改课程对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="deptRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="classRef" :model="form" :rules="rules" label-width="80px">
         <el-row>
-          <el-col :span="24" v-if="form.parentId !== 0">
-            <el-form-item label="上级部门" prop="parentId">
-              <el-tree-select
-                v-model="form.parentId"
-                :data="deptOptions"
-                :props="{
-                  value: 'classId',
-                  label: 'deptName',
-                  children: 'children',
-                }"
-                value-key="classId"
-                placeholder="选择上级部门"
-                check-strictly
-              />
+          <el-col :span="22">
+            <el-form-item label="课程名称" prop="className">
+              <el-input v-model="form.className" placeholder="请输入课程名称" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="部门名称" prop="deptName">
-              <el-input v-model="form.deptName" placeholder="请输入部门名称" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="显示排序" prop="orderNum">
-              <el-input-number
-                v-model="form.orderNum"
-                controls-position="right"
-                :min="0"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="负责人" prop="leader">
+          <el-col :span="22">
+            <el-form-item label="讲师" prop="teacherName">
               <el-input
-                v-model="form.leader"
-                placeholder="请输入负责人"
+                v-model="form.teacherName"
+                placeholder="请输入讲师姓名"
                 maxlength="20"
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="联系电话" prop="phone">
+          <el-col :span="22">
+            <el-form-item label="上课地点" prop="location">
               <el-input
-                v-model="form.phone"
-                placeholder="请输入联系电话"
-                maxlength="11"
+                v-model="form.location"
+                placeholder="请输入上课地点"
+                maxlength="500"
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="邮箱" prop="email">
-              <el-input
-                v-model="form.email"
-                placeholder="请输入邮箱"
-                maxlength="50"
+          <el-col :span="22">
+            <el-form-item label="开课时间" prop="classBeginTimeStr">
+              <el-date-picker
+                v-model="form.classBeginTimeStr"
+                type="datetime"
+                placeholder="请选择开课时间"
+                style="width: 100%"
+                format="YYYY-MM-DD HH:mm:ss"
+                value-format="YYYY-MM-DD HH:mm:ss"
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="部门状态">
-              <el-radio-group v-model="form.status">
-                <el-radio
-                  v-for="dict in training_class_status"
-                  :key="dict.value"
-                  :value="dict.value"
-                  >{{ dict.label }}</el-radio
-                >
-              </el-radio-group>
+          <el-col :span="22">
+            <el-form-item label="课程内容" prop="content">
+              <el-input
+                v-model="form.content"
+                style="width: 100%"
+                :rows="8"
+                type="textarea"
+                placeholder="请输入课程内容"
+              />
             </el-form-item>
           </el-col>
         </el-row>
@@ -207,11 +194,47 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 修改课程状态对话框 -->
+    <el-dialog
+      title="修改课程状态"
+      v-model="statusOpen"
+      width="400px"
+      append-to-body
+    >
+      <el-form ref="statusRef" :model="status" label-width="80px">
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="课程状态" prop="className">
+              <el-select
+                v-model="status"
+                placeholder="Select"
+                size="large"
+                style="width: 240px"
+              >
+                <el-option
+                  v-for="item in training_class_status"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="changeStatus">确 定</el-button>
+          <el-button @click="cancelStatus">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Class">
-import {listClass} from "@/api/system/class";
+import {addClass, delClass, getClass, listClass, updateClass,} from "@/api/system/class";
 
 const { proxy } = getCurrentInstance();
 const { training_class_status } = proxy.useDict("training_class_status");
@@ -221,40 +244,35 @@ const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const title = ref("");
-const deptOptions = ref([]);
 const isExpandAll = ref(true);
 const refreshTable = ref(true);
+const status = ref("");
+const statusOpen = ref(false);
+const currentClassId = ref(null);
 
 const data = reactive({
   form: {},
   queryParams: {
-    deptName: undefined,
+    className: undefined,
+    teacherName: undefined,
+    queryBeginTime: undefined,
+    queryEndTime: undefined,
     status: undefined,
   },
   rules: {
-    parentId: [
-      { required: true, message: "上级部门不能为空", trigger: "blur" },
+    className: [
+      { required: true, message: "课程名称不能为空", trigger: "blur" },
     ],
-    deptName: [
-      { required: true, message: "部门名称不能为空", trigger: "blur" },
+    teacherName: [
+      { required: true, message: "讲师姓名不能为空", trigger: "blur" },
     ],
-    orderNum: [
-      { required: true, message: "显示排序不能为空", trigger: "blur" },
+    location: [
+      { required: true, message: "上课地点不能为空", trigger: "blur" },
     ],
-    email: [
-      {
-        type: "email",
-        message: "请输入正确的邮箱地址",
-        trigger: ["blur", "change"],
-      },
+    classBeginTimeStr: [
+      { required: true, message: "开课时间不能为空", trigger: "blur" },
     ],
-    phone: [
-      {
-        pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
-        message: "请输入正确的手机号码",
-        trigger: "blur",
-      },
-    ],
+    content: [{ required: true, message: "课程内容不能为空", trigger: "blur" }],
   },
 });
 
@@ -275,6 +293,11 @@ function cancel() {
   reset();
 }
 
+/** 取消修改状态按钮 */
+function cancelStatus() {
+  statusOpen.value = false;
+}
+
 /** 表单重置 */
 function reset() {
   form.value = {
@@ -287,7 +310,7 @@ function reset() {
     email: undefined,
     status: "0",
   };
-  proxy.resetForm("deptRef");
+  proxy.resetForm("classRef");
 }
 
 /** 搜索按钮操作 */
@@ -302,52 +325,55 @@ function resetQuery() {
 }
 
 /** 新增按钮操作 */
-function handleAdd(row) {
+function handleAdd() {
   reset();
-  listDept().then((response) => {
-    deptOptions.value = proxy.handleTree(response.data, "classId");
-  });
-  if (row != undefined) {
-    form.value.parentId = row.classId;
-  }
   open.value = true;
-  title.value = "添加部门";
-}
-
-/** 展开/折叠操作 */
-function toggleExpandAll() {
-  refreshTable.value = false;
-  isExpandAll.value = !isExpandAll.value;
-  nextTick(() => {
-    refreshTable.value = true;
-  });
+  title.value = "添加课程";
 }
 
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  listDeptExcludeChild(row.classId).then((response) => {
-    deptOptions.value = proxy.handleTree(response.data, "classId");
-  });
-  getDept(row.classId).then((response) => {
+  getClass(row.classId).then((response) => {
     form.value = response.data;
+    form.value.classBeginTimeStr = response.data.classBeginTime;
     open.value = true;
-    title.value = "修改部门";
+    title.value = "修改课程";
   });
+}
+
+/** 修改状态按钮操作 */
+function handleUpdateStatus(row) {
+  statusOpen.value = true;
+  currentClassId.value = row.classId;
+  status.value = row.status;
+}
+
+/** 修改状态 */
+function changeStatus() {
+  updateClass({ classId: currentClassId.value, status: status.value }).then(
+    () => {
+      statusOpen.value = false;
+      proxy.$modal.msgSuccess("修改成功");
+      open.value = false;
+      getList();
+    }
+  );
 }
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["deptRef"].validate((valid) => {
+  proxy.$refs["classRef"].validate((valid) => {
     if (valid) {
+      form.value.classBeginTime = null;
       if (form.value.classId != undefined) {
-        updateDept(form.value).then((response) => {
+        updateClass(form.value).then((response) => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        addDept(form.value).then((response) => {
+        addClass(form.value).then(() => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
@@ -360,9 +386,9 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   proxy.$modal
-    .confirm('是否确认删除名称为"' + row.deptName + '"的数据项?')
+    .confirm('是否确认删除课程【"' + row.className + '"】?')
     .then(function () {
-      return delDept(row.classId);
+      return delClass(row.classId);
     })
     .then(() => {
       getList();

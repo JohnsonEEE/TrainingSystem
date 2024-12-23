@@ -34,6 +34,7 @@
 package com.training.system.mapper;
 
 
+import com.training.common.core.domain.entity.TrainingClass;
 import com.training.system.domain.TrainingClassVO;
 
 import java.util.List;
@@ -43,5 +44,13 @@ import java.util.List;
  * @date 2024.12.23
  */
 public interface TrainingClassMapper {
-    List<TrainingClassVO> selectClassList(TrainingClassVO vo);
+    List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO);
+
+    void addClass(TrainingClass trainingClass);
+
+    void delClass(String classId);
+
+    TrainingClassVO getTrainingClass(String classId);
+
+    void updateClass(TrainingClass trainingClass);
 }

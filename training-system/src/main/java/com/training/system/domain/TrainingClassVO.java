@@ -69,6 +69,11 @@ public class TrainingClassVO implements Serializable {
     private String classNamePY;
 
     /**
+     * 课程开始时间str
+     */
+    private String classBeginTimeStr;
+
+    /**
      * 课程开始时间
      */
     @JsonFormat(pattern = Constants.DATETIME_FORMAT)

@@ -57,4 +57,32 @@ public class TrainingClassController extends BaseController {
     {
         return AjaxResult.success(trainingClassService.selectClassList(trainingClassVO));
     }
+
+    @RequestMapping("/addClass")
+    public AjaxResult addClass(TrainingClassVO trainingClassVO)
+    {
+        trainingClassService.addClass(trainingClassVO);
+        return AjaxResult.success();
+    }
+
+    @RequestMapping("/updateClass")
+    public AjaxResult updateClass(TrainingClassVO trainingClassVO)
+    {
+        trainingClassService.updateClass(trainingClassVO);
+        return AjaxResult.success();
+    }
+
+    @RequestMapping("/delClass")
+    public AjaxResult delClass(String classId)
+    {
+        trainingClassService.delClass(classId);
+        return AjaxResult.success();
+    }
+
+    @RequestMapping("/getClass")
+    public AjaxResult getTrainingClass(String classId)
+    {
+        TrainingClassVO trainingClassVO = trainingClassService.getTrainingClass(classId);
+        return AjaxResult.success(trainingClassVO);
+    }
 }

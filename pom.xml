@@ -31,6 +31,8 @@
         <jwt.version>0.9.1</jwt.version>
         <lombok.version>1.18.22</lombok.version>
         <mapper-spring-boot-starter.version>2.1.5</mapper-spring-boot-starter.version>
+        <hutool.version>5.8.32</hutool.version>
+        <tinyPinyin.version>2.0.3.RELEASE</tinyPinyin.version>
         <!-- override dependency version -->
         <tomcat.version>9.0.96</tomcat.version>
         <logback.version>1.2.13</logback.version>
@@ -217,6 +219,20 @@
                 <groupId>tk.mybatis</groupId>
                 <artifactId>mapper-spring-boot-starter</artifactId>
                 <version>${mapper-spring-boot-starter.version}</version>
+            </dependency>
+
+            <!-- hutool工具 -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <!-- 拼音 -->
+            <dependency>
+                <groupId>io.github.biezhi</groupId>
+                <artifactId>TinyPinyin</artifactId>
+                <version>${tinyPinyin.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

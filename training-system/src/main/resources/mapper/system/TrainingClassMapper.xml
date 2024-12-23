@@ -1,19 +1,64 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.training.system.mapper.TrainingClassMapper">
+    <insert id="addClass" parameterType="com.training.common.core.domain.entity.TrainingClass">
+        insert into training_class (class_name, class_name_py, class_begin_time, location, teacher_name, content,
+                                    status)
+        values (#{className},
+                #{classNamePY},
+                #{classBeginTime},
+                #{location},
+                #{teacherName},
+                #{content},
+                #{status})
+    </insert>
 
-	<select id="selectClassList"
+    <update id="updateClass" parameterType="com.training.common.core.domain.entity.TrainingClass">
+        update training_class
+        <set>
+            <if test="className!=null">
+                class_name = #{className},
+            </if>
+            <if test="classNamePY!=null">
+                class_name_py = #{classNamePY},
+            </if>
+            <if test="classBeginTime!=null">
+                class_begin_time = #{classBeginTime},
+            </if>
+            <if test="location!=null">
+                location = #{location},
+            </if>
+            <if test="teacherName!=null">
+                teacher_name = #{teacherName},
+            </if>
+            <if test="content!=null">
+                content = #{content},
+            </if>
+            <if test="status!=null">
+                status = #{status},
+            </if>
+        </set>
+        where class_id = #{classId}
+    </update>
+
+    <delete id="delClass">
+        delete
+        from training_class
+        where class_id = #{classId}
+    </delete>
+
+    <select id="selectClassList"
             parameterType="com.training.system.domain.TrainingClassVO"
             resultType="com.training.system.domain.TrainingClassVO">
-	    select class_id AS classId, class_name AS className, class_name_py AS classNamePy,
-	           class_begin_time AS classBeginTime, location, teacher_name AS teacherName, content, status
-	    from training_class
+        select class_id AS classId, class_name AS className, class_name_py AS classNamePy,
+        class_begin_time AS classBeginTime, location, teacher_name AS teacherName, content, status
+        from training_class
         <where>
             <if test="className!=null and className!=''">
-                AND (lower(class_name) like '%' || lower(#{className}) || '%'
-                OR lower(class_name_py) like '%' || lower(#{className}) || '%')
+                AND (lower(class_name) like lower(#{className})
+                OR lower(class_name_py) like lower(#{className}))
             </if>
             <if test="queryBeginTime!=null">
                 AND class_begin_time <![CDATA[>=]]> #{queryBeginTime}
@@ -22,9 +67,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND class_begin_time <![CDATA[<=>]]> #{queryEndTime}
             </if>
             <if test="teacherName!=null and teacherName!=''">
-                AND lower(teacher_name) like '%' || lower(#{teacherName}) || '%'
+                AND lower(teacher_name) like lower(#{teacherName})
+            </if>
+            <if test="status!=null and status!=''">
+                AND status = #{status}
             </if>
         </where>
-	</select>
-	
+    </select>
+
+    <select id="getTrainingClass" resultType="com.training.system.domain.TrainingClassVO">
+        select class_id         AS classId,
+               class_name       AS className,
+               class_name_py    AS classNamePy,
+               class_begin_time AS classBeginTime,
+               location,
+               teacher_name     AS teacherName,
+               content,
+               status
+        from training_class
+        where class_id = #{classId}
+    </select>
+
 </mapper>

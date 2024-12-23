@@ -440,6 +440,7 @@ insert into sys_dict_type values(7,  '通知类型', 'sys_notice_type',     '0',
 insert into sys_dict_type values(8,  '通知状态', 'sys_notice_status',   '0', 'admin', sysdate(), '', null, '通知状态列表');
 insert into sys_dict_type values(9,  '操作类型', 'sys_oper_type',       '0', 'admin', sysdate(), '', null, '操作类型列表');
 insert into sys_dict_type values(10, '系统状态', 'sys_common_status',   '0', 'admin', sysdate(), '', null, '登录状态列表');
+INSERT INTO sys_dict_type VALUES(11, '培训课程状态','training_class_status','0','admin',sysdate(),'',NULL,'培训课程状态');
 
 
 -- ----------------------------
@@ -494,6 +495,10 @@ insert into sys_dict_data values(26, 8,  '生成代码', '8',       'sys_oper_ty
 insert into sys_dict_data values(27, 9,  '清空数据', '9',       'sys_oper_type',       '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '清空操作');
 insert into sys_dict_data values(28, 1,  '成功',     '0',       'sys_common_status',   '',   'primary', 'N', '0', 'admin', sysdate(), '', null, '正常状态');
 insert into sys_dict_data values(29, 2,  '失败',     '1',       'sys_common_status',   '',   'danger',  'N', '0', 'admin', sysdate(), '', null, '停用状态');
+INSERT INTO sys_dict_data VALUES(30, 0,'未开始','0','training_class_status',NULL,'default','N','0','admin',sysdate(),'',NULL,NULL);
+INSERT INTO sys_dict_data VALUES(31, 1,'进行中','1','training_class_status',NULL,'primary','N','0','admin',sysdate(),'admin',NULL,NULL);
+INSERT INTO sys_dict_data VALUES(32, 2,'已完成','2','training_class_status',NULL,'success','N','0','admin',sysdate(),'',NULL,NULL);
+INSERT INTO sys_dict_data VALUES(33, 3,'已取消','3','training_class_status',NULL,'info','N','0','admin',sysdate(),'',NULL,NULL);
 
 
 -- ----------------------------
@@ -546,7 +551,7 @@ create table sys_logininfor (
 -- ----------------------------
 drop table if exists training_class;
 create table training_class (
-                                class_id bigint(20) not null comment '课程id，主键',
+                                class_id bigint(20) not null auto_increment comment '课程id，主键',
                                 class_name varchar(100) default null comment '课程名称',
                                 class_name_py varchar(100) default null comment '课程名称拼音',
                                 class_begin_time datetime default null comment '课程开始时间',

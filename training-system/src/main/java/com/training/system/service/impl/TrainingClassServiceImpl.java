@@ -33,12 +33,19 @@
  */
 package com.training.system.service.impl;
 
+import cn.hutool.extra.pinyin.PinyinUtil;
+import com.training.common.core.domain.entity.TrainingClass;
+import com.training.common.enums.TrainingClassStatusEnum;
+import com.training.common.utils.StringUtils;
+import com.training.common.utils.bean.BeanUtils;
 import com.training.system.domain.TrainingClassVO;
 import com.training.system.mapper.TrainingClassMapper;
 import com.training.system.service.ITrainingClassService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -53,7 +60,42 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
 
     @Override
     public List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO) {
-        List<TrainingClassVO> trainingClassVOS = trainingClassMapper.selectClassList(trainingClassVO);
-        return trainingClassVOS;
+        if (StringUtils.isNotBlank(trainingClassVO.getClassName())) {
+            trainingClassVO.setClassName("%" + trainingClassVO.getClassName() + "%");
+        }
+        return trainingClassMapper.selectClassList(trainingClassVO);
+    }
+
+    @Override
+    public void addClass(TrainingClassVO trainingClassVO) {
+        TrainingClass trainingClass = new TrainingClass();
+        BeanUtils.copyBeanProp(trainingClass, trainingClassVO);
+        trainingClass.setStatus(TrainingClassStatusEnum.NOT_BEGIN.getCode());
+        trainingClass.setClassNamePY(PinyinUtil.getFirstLetter(trainingClassVO.getClassName(), ""));
+        trainingClass.setClassBeginTime(LocalDateTime.from(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").parse(trainingClassVO.getClassBeginTimeStr())));
+        trainingClassMapper.addClass(trainingClass);
+    }
+
+    @Override
+    public void delClass(String classId) {
+        trainingClassMapper.delClass(classId);
+    }
+
+    @Override
+    public TrainingClassVO getTrainingClass(String classId) {
+        return trainingClassMapper.getTrainingClass(classId);
+    }
+
+    @Override
+    public void updateClass(TrainingClassVO trainingClassVO) {
+        TrainingClass trainingClass = new TrainingClass();
+        BeanUtils.copyBeanProp(trainingClass, trainingClassVO);
+        if (StringUtils.isNotBlank(trainingClassVO.getClassName())) {
+            trainingClass.setClassNamePY(PinyinUtil.getFirstLetter(trainingClassVO.getClassName(), ""));
+        }
+        if (StringUtils.isNotBlank(trainingClassVO.getClassBeginTimeStr())) {
+            trainingClass.setClassBeginTime(LocalDateTime.from(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").parse(trainingClassVO.getClassBeginTimeStr())));
+        }
+        trainingClassMapper.updateClass(trainingClass);
     }
 }

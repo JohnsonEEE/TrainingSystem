@@ -71,7 +71,7 @@ public class TrainingClass {
     private String classNamePY;
 
     /**
-     * 课程开始时间
+     * 开课时间
      */
     private LocalDateTime classBeginTime;
 
