@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.mapper.TrainingSignUpMapper">
+    <insert id="addSignUp" parameterType="com.training.common.core.domain.entity.TrainingSignUp">
+        insert into training_sign_up (people_id,people_name,class_id,status,sign_up_time,cancel_time)
+        values (#{peopleId},
+                #{peopleName},
+                #{classId},
+                #{status},
+                #{signUpTime},
+                #{cancelTime})
+    </insert>
+
+    <update id="updateSignUp" parameterType="com.training.common.core.domain.entity.TrainingSignUp">
+        update training_sign_up
+        <set>
+            <if test="status!=null">
+                status = #{status},
+            </if>
+            <if test="signUpTime!=null">
+                sign_up_time = #{signUpTime},
+            </if>
+            <if test="cancelTime!=null">
+                cancel_time = #{cancelTime},
+            </if>
+        </set>
+        where people_id = #{peopleId} and class_id = #{classId}
+    </update>
+
+    <select id="selectSignUpList"
+            parameterType="com.training.system.domain.TrainingClassVO"
+            resultType="com.training.system.domain.TrainingClassVO">
+        select a.class_id AS classId, a.class_name AS className, a.class_name_py AS classNamePy,
+        a.class_begin_time AS classBeginTime, a.location, a.teacher_name AS teacherName, a.content, a.status,
+        a.max_participant_count AS maxParticipantCount,
+        b.sign_up_id AS signUpId, b.people_id AS peopleId, b.people_name AS peopleName, b.status AS signUpStatus,
+        b.sign_up_time AS signUpTime,
+        (select count(*) from training_sign_up c where c.class_id = a.class_id and c.status = '1') AS signUpCount
+        from training_class a
+        left join training_sign_up b on a.class_id = b.class_id and b.people_id = #{peopleId} and b.status = '1'
+        <where>
+            <if test="className!=null and className!=''">
+                AND (lower(a.class_name) like lower(#{className})
+                OR lower(a.class_name_py) like lower(#{className}))
+            </if>
+            <if test="queryBeginTime!=null">
+                AND a.class_begin_time <![CDATA[>=]]> #{queryBeginTime}
+            </if>
+            <if test="queryEndTime!=null">
+                AND a.class_begin_time <![CDATA[<=>]]> #{queryEndTime}
+            </if>
+            <if test="teacherName!=null and teacherName!=''">
+                AND lower(a.teacher_name) like lower(#{teacherName})
+            </if>
+            <if test="status!=null and status!=''">
+                AND a.status = #{status}
+            </if>
+        </where>
+    </select>
+</mapper>

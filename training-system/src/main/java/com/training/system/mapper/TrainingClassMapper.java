@@ -48,9 +48,9 @@ public interface TrainingClassMapper {
 
     void addClass(TrainingClass trainingClass);
 
-    void delClass(String classId);
+    void delClass(Integer classId);
 
-    TrainingClassVO getTrainingClass(String classId);
+    TrainingClassVO getTrainingClass(Integer classId);
 
     void updateClass(TrainingClass trainingClass);
 }

@@ -31,31 +31,38 @@
  *
  * Copyright version 2.0
  */
-package com.training.system.service;
+package com.training.common.core.domain.entity;
 
-import com.training.common.core.domain.entity.TrainingSignUp;
-import com.training.system.domain.TrainingClassVO;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-import java.util.List;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author training
- * @date 2024.12.23
+ * @date 2024.12.24
  */
-public interface ITrainingClassService {
-    List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO);
+@Getter
+@Setter
+@Accessors(chain = true)
+public class TrainingSignUp implements Serializable {
 
-    void addClass(TrainingClassVO trainingClassVO);
+    private static final long serialVersionUID = -8902319451469692260L;
 
-    void delClass(Integer classId);
-
-    TrainingClassVO getTrainingClass(Integer classId);
-
-    void updateClass(TrainingClassVO trainingClassVO);
-
-    void signUp(TrainingSignUp trainingSignUp);
-
-    void cancelSignUp(TrainingSignUp trainingSignUp);
-
-    List<TrainingClassVO> selectSignUpList(TrainingClassVO trainingClassVO);
+    /** 报名id，主键 */
+    private Integer signUpId;
+    /** 人员id */
+    private Integer peopleId;
+    /** 人员姓名 */
+    private String peopleName;
+    /** 报名课程id */
+    private Integer classId;
+    /** 报名状态 */
+    private String status;
+    /** 报名时间 */
+    private LocalDateTime signUpTime;
+    /** 取消报名时间 */
+    private LocalDateTime cancelTime;
 }

@@ -35,8 +35,10 @@ package com.training.web.controller.training;
 
 import com.training.common.core.controller.BaseController;
 import com.training.common.core.domain.AjaxResult;
+import com.training.common.core.domain.entity.TrainingSignUp;
 import com.training.system.domain.TrainingClassVO;
 import com.training.system.service.ITrainingClassService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,41 +50,59 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/training")
+@Slf4j
 public class TrainingClassController extends BaseController {
     @Resource
     private ITrainingClassService trainingClassService;
 
     @RequestMapping("/classList")
-    public AjaxResult classList(TrainingClassVO trainingClassVO)
-    {
+    public AjaxResult classList(TrainingClassVO trainingClassVO) {
         return AjaxResult.success(trainingClassService.selectClassList(trainingClassVO));
     }
 
     @RequestMapping("/addClass")
-    public AjaxResult addClass(TrainingClassVO trainingClassVO)
-    {
+    public AjaxResult addClass(TrainingClassVO trainingClassVO) {
         trainingClassService.addClass(trainingClassVO);
         return AjaxResult.success();
     }
 
     @RequestMapping("/updateClass")
-    public AjaxResult updateClass(TrainingClassVO trainingClassVO)
-    {
+    public AjaxResult updateClass(TrainingClassVO trainingClassVO) {
         trainingClassService.updateClass(trainingClassVO);
         return AjaxResult.success();
     }
 
     @RequestMapping("/delClass")
-    public AjaxResult delClass(String classId)
-    {
+    public AjaxResult delClass(Integer classId) {
         trainingClassService.delClass(classId);
         return AjaxResult.success();
     }
 
     @RequestMapping("/getClass")
-    public AjaxResult getTrainingClass(String classId)
-    {
+    public AjaxResult getTrainingClass(Integer classId) {
         TrainingClassVO trainingClassVO = trainingClassService.getTrainingClass(classId);
         return AjaxResult.success(trainingClassVO);
+    }
+
+    @RequestMapping("/signUp")
+    public AjaxResult signUp(TrainingSignUp trainingSignUp) {
+        try {
+            trainingClassService.signUp(trainingSignUp);
+            return AjaxResult.success();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/cancelSignUp")
+    public AjaxResult cancelSignUp(TrainingSignUp trainingSignUp) {
+        trainingClassService.cancelSignUp(trainingSignUp);
+        return AjaxResult.success();
+    }
+
+    @RequestMapping("/signList")
+    public AjaxResult signList(TrainingClassVO trainingClassVO) {
+        return AjaxResult.success(trainingClassService.selectSignUpList(trainingClassVO));
     }
 }

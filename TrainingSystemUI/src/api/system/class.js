@@ -44,3 +44,30 @@ export function updateClass(trainingClass) {
     params: trainingClass
   })
 }
+
+// 报名课程
+export function signUp(trainingSignUp) {
+  return request({
+    url: '/training/signUp',
+    method: 'post',
+    params: trainingSignUp
+  })
+}
+
+// 取消报名课程
+export function cancelSignUp(trainingSignUp) {
+  return request({
+    url: '/training/cancelSignUp',
+    method: 'post',
+    params: trainingSignUp
+  })
+}
+
+// 查询报名列表
+export function listSignUp(query) {
+  return request({
+    url: '/training/signList',
+    method: 'post',
+    params: query
+  })
+}

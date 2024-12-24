@@ -32,23 +32,6 @@
       </el-form-item>
     </el-form>
 
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['system:dept:add']"
-          >新增</el-button
-        >
-      </el-col>
-      <right-toolbar
-        v-model:showSearch="showSearch"
-        @queryTable="getList"
-      ></right-toolbar>
-    </el-row>
-
     <el-table
       v-if="refreshTable"
       v-loading="loading"
@@ -92,6 +75,14 @@
           />
         </template>
       </el-table-column>
+      <el-table-column prop="signUpStatus" label="报名状态" width="100">
+        <template #default="scope">
+          <dict-tag
+            :options="training_sign_up_status"
+            :value="scope.row.signUpStatus"
+          />
+        </template>
+      </el-table-column>
       <el-table-column
         label="操作"
         align="center"
@@ -102,35 +93,39 @@
             link
             type="primary"
             icon="Edit"
-            @click="handleUpdateStatus(scope.row)"
-            v-hasPermi="['system:dept:edit']"
-            >改变状态</el-button
+            @click="handleUpdate(scope.row)"
+            >查看详情</el-button
           >
           <el-button
+            v-if="scope.row.signUpStatus == '0'"
             link
             type="primary"
             icon="Edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:dept:edit']"
-            >修改</el-button
+            @click="handleSignUp(scope.row)"
+            >报名</el-button
           >
           <el-button
-            v-if="scope.row.parentId != 0"
+            v-if="scope.row.signUpStatus == '1'"
             link
             style="color: red"
             type="primary"
-            icon="Delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:dept:remove']"
-            >删除</el-button
+            icon="Edit"
+            @click="handleCancelSignUp(scope.row)"
+            >取消报名</el-button
           >
         </template>
       </el-table-column>
     </el-table>
 
-    <!-- 添加或修改课程对话框 -->
+    <!-- 课程详情对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="classRef" :model="form" :rules="rules" label-width="80px">
+      <el-form
+        ref="classRef"
+        :model="form"
+        :rules="rules"
+        label-width="80px"
+        disabled="true"
+      >
         <el-row>
           <el-col :span="22">
             <el-form-item label="课程名称" prop="className">
@@ -155,13 +150,18 @@
               />
             </el-form-item>
           </el-col>
-          <el-col :span="22">
+          <el-col :span="12">
             <el-form-item label="最多人数" prop="maxParticipantCount">
               <el-input-number
                 v-model="form.maxParticipantCount"
                 :min="1"
                 :max="500"
               />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="已报人数" prop="signUpCount">
+              <el-input-number v-model="form.signUpCount" :min="1" :max="500" />
             </el-form-item>
           </el-col>
           <el-col :span="22">
@@ -191,44 +191,7 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 修改课程状态对话框 -->
-    <el-dialog
-      title="修改课程状态"
-      v-model="statusOpen"
-      width="400px"
-      append-to-body
-    >
-      <el-form ref="statusRef" :model="status" label-width="80px">
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="课程状态" prop="className">
-              <el-select
-                v-model="status"
-                placeholder="Select"
-                size="large"
-                style="width: 240px"
-              >
-                <el-option
-                  v-for="item in training_class_status"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="changeStatus">确 定</el-button>
-          <el-button @click="cancelStatus">取 消</el-button>
+          <el-button @click="cancel">关 闭</el-button>
         </div>
       </template>
     </el-dialog>
@@ -236,10 +199,12 @@
 </template>
 
 <script setup name="Class">
-import {addClass, delClass, getClass, listClass, updateClass,} from "@/api/system/class";
+import {addClass, cancelSignUp, delClass, getClass, listSignUp, signUp, updateClass,} from "@/api/system/class";
+import useUserStore from "@/store/modules/user";
 
 const { proxy } = getCurrentInstance();
 const { training_class_status } = proxy.useDict("training_class_status");
+const { training_sign_up_status } = proxy.useDict("training_sign_up_status");
 
 const classList = ref([]);
 const open = ref(false);
@@ -252,6 +217,8 @@ const status = ref("");
 const statusOpen = ref(false);
 const currentClassId = ref(null);
 
+const userStore = useUserStore();
+
 const data = reactive({
   form: {},
   queryParams: {
@@ -260,24 +227,7 @@ const data = reactive({
     queryBeginTime: undefined,
     queryEndTime: undefined,
     status: undefined,
-  },
-  rules: {
-    className: [
-      { required: true, message: "课程名称不能为空", trigger: "blur" },
-    ],
-    teacherName: [
-      { required: true, message: "讲师姓名不能为空", trigger: "blur" },
-    ],
-    location: [
-      { required: true, message: "上课地点不能为空", trigger: "blur" },
-    ],
-    classBeginTimeStr: [
-      { required: true, message: "开课时间不能为空", trigger: "blur" },
-    ],
-    content: [{ required: true, message: "课程内容不能为空", trigger: "blur" }],
-    maxParticipantCount: [
-      { required: true, message: "最多人数不能为空", trigger: "blur" },
-    ],
+    peopleId: userStore.id,
   },
 });
 
@@ -286,7 +236,7 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询课程列表 */
 function getList() {
   loading.value = true;
-  listClass(queryParams.value).then((response) => {
+  listSignUp(queryParams.value).then((response) => {
     classList.value = response.data;
     loading.value = false;
   });
@@ -343,7 +293,7 @@ function handleUpdate(row) {
     form.value = response.data;
     form.value.classBeginTimeStr = response.data.classBeginTime;
     open.value = true;
-    title.value = "修改课程";
+    title.value = "课程详情";
   });
 }
 
@@ -398,6 +348,41 @@ function handleDelete(row) {
     .then(() => {
       getList();
       proxy.$modal.msgSuccess("删除成功");
+    })
+    .catch(() => {});
+}
+
+/** 报名 */
+function handleSignUp(row) {
+  proxy.$modal
+    .confirm('是否确认报名课程【"' + row.className + '"】?')
+    .then(function () {
+      return signUp({
+        classId: row.classId,
+        peopleId: userStore.id,
+        peopleName: userStore.name,
+      });
+    })
+    .then(() => {
+      getList();
+      proxy.$modal.msgSuccess("报名成功");
+    })
+    .catch(() => {});
+}
+
+/** 取消报名 */
+function handleCancelSignUp(row) {
+  proxy.$modal
+    .confirm('是否确认取消报名课程【"' + row.className + '"】?')
+    .then(function () {
+      return cancelSignUp({
+        classId: row.classId,
+        peopleId: userStore.id,
+      });
+    })
+    .then(() => {
+      getList();
+      proxy.$modal.msgSuccess("取消报名成功");
     })
     .catch(() => {});
 }

@@ -5,14 +5,15 @@
 <mapper namespace="com.training.system.mapper.TrainingClassMapper">
     <insert id="addClass" parameterType="com.training.common.core.domain.entity.TrainingClass">
         insert into training_class (class_name, class_name_py, class_begin_time, location, teacher_name, content,
-                                    status)
+                                    status, max_participant_count)
         values (#{className},
                 #{classNamePY},
                 #{classBeginTime},
                 #{location},
                 #{teacherName},
                 #{content},
-                #{status})
+                #{status},
+                #{maxParticipantCount})
     </insert>
 
     <update id="updateClass" parameterType="com.training.common.core.domain.entity.TrainingClass">
@@ -39,6 +40,9 @@
             <if test="status!=null">
                 status = #{status},
             </if>
+            <if test="maxParticipantCount!=null">
+                max_participant_count = #{maxParticipantCount},
+            </if>
         </set>
         where class_id = #{classId}
     </update>
@@ -52,40 +56,44 @@
     <select id="selectClassList"
             parameterType="com.training.system.domain.TrainingClassVO"
             resultType="com.training.system.domain.TrainingClassVO">
-        select class_id AS classId, class_name AS className, class_name_py AS classNamePy,
-        class_begin_time AS classBeginTime, location, teacher_name AS teacherName, content, status
-        from training_class
+        select a.class_id AS classId, a.class_name AS className, a.class_name_py AS classNamePy,
+        a.class_begin_time AS classBeginTime, a.location, a.teacher_name AS teacherName, a.content, a.status,
+               a.max_participant_count AS maxParticipantCount,
+               (select count(*) from training_sign_up b where b.class_id = a.class_id and b.status = '1') AS signUpCount
+        from training_class a
         <where>
             <if test="className!=null and className!=''">
-                AND (lower(class_name) like lower(#{className})
-                OR lower(class_name_py) like lower(#{className}))
+                AND (lower(a.class_name) like lower(#{className})
+                OR lower(a.class_name_py) like lower(#{className}))
             </if>
             <if test="queryBeginTime!=null">
-                AND class_begin_time <![CDATA[>=]]> #{queryBeginTime}
+                AND a.class_begin_time <![CDATA[>=]]> #{queryBeginTime}
             </if>
             <if test="queryEndTime!=null">
-                AND class_begin_time <![CDATA[<=>]]> #{queryEndTime}
+                AND a.class_begin_time <![CDATA[<=>]]> #{queryEndTime}
             </if>
             <if test="teacherName!=null and teacherName!=''">
-                AND lower(teacher_name) like lower(#{teacherName})
+                AND lower(a.teacher_name) like lower(#{teacherName})
             </if>
             <if test="status!=null and status!=''">
-                AND status = #{status}
+                AND a.status = #{status}
             </if>
         </where>
     </select>
 
     <select id="getTrainingClass" resultType="com.training.system.domain.TrainingClassVO">
-        select class_id         AS classId,
-               class_name       AS className,
-               class_name_py    AS classNamePy,
-               class_begin_time AS classBeginTime,
-               location,
-               teacher_name     AS teacherName,
-               content,
-               status
-        from training_class
-        where class_id = #{classId}
+        select a.class_id              AS classId,
+               a.class_name            AS className,
+               a.class_name_py         AS classNamePy,
+               a.class_begin_time      AS classBeginTime,
+               a.location,
+               a.teacher_name          AS teacherName,
+               a.content,
+               a.status,
+               a.max_participant_count AS maxParticipantCount,
+               (select count(*) from training_sign_up b where b.class_id = a.class_id and b.status = '1') AS signUpCount
+        from training_class a
+        where a.class_id = #{classId}
     </select>
 
 </mapper>

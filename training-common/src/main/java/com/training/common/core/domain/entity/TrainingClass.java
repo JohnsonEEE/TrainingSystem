@@ -95,4 +95,9 @@ public class TrainingClass {
      * 状态可以查看枚举 com.training.common.enums.TrainingClassStatusEnum
      */
     private String status;
+
+    /**
+     * 最大报名人数
+     */
+    private Integer maxParticipantCount;
 }

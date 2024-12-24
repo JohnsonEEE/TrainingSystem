@@ -31,31 +31,30 @@
  *
  * Copyright version 2.0
  */
-package com.training.system.service;
+package com.training.common.enums;
 
-import com.training.common.core.domain.entity.TrainingSignUp;
-import com.training.system.domain.TrainingClassVO;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
+ * 报名状态枚举
+ *
  * @author training
  * @date 2024.12.23
  */
-public interface ITrainingClassService {
-    List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO);
+@Getter
+@AllArgsConstructor
+public enum TrainingSignUpStatusEnum {
+    NOT_SIGN_UP("0", "未报名"),
+    SIGN_UP("1", "已报名");
 
-    void addClass(TrainingClassVO trainingClassVO);
+    /**
+     * 编码
+     */
+    private String code;
 
-    void delClass(Integer classId);
-
-    TrainingClassVO getTrainingClass(Integer classId);
-
-    void updateClass(TrainingClassVO trainingClassVO);
-
-    void signUp(TrainingSignUp trainingSignUp);
-
-    void cancelSignUp(TrainingSignUp trainingSignUp);
-
-    List<TrainingClassVO> selectSignUpList(TrainingClassVO trainingClassVO);
+    /**
+     * 名称
+     */
+    private String name;
 }

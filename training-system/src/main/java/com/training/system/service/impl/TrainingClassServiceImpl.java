@@ -35,11 +35,14 @@ package com.training.system.service.impl;
 
 import cn.hutool.extra.pinyin.PinyinUtil;
 import com.training.common.core.domain.entity.TrainingClass;
+import com.training.common.core.domain.entity.TrainingSignUp;
 import com.training.common.enums.TrainingClassStatusEnum;
+import com.training.common.enums.TrainingSignUpStatusEnum;
 import com.training.common.utils.StringUtils;
 import com.training.common.utils.bean.BeanUtils;
 import com.training.system.domain.TrainingClassVO;
 import com.training.system.mapper.TrainingClassMapper;
+import com.training.system.mapper.TrainingSignUpMapper;
 import com.training.system.service.ITrainingClassService;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +60,9 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
 
     @Resource
     private TrainingClassMapper trainingClassMapper;
+
+    @Resource
+    private TrainingSignUpMapper trainingSignUpMapper;
 
     @Override
     public List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO) {
@@ -77,12 +83,12 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
     }
 
     @Override
-    public void delClass(String classId) {
+    public void delClass(Integer classId) {
         trainingClassMapper.delClass(classId);
     }
 
     @Override
-    public TrainingClassVO getTrainingClass(String classId) {
+    public TrainingClassVO getTrainingClass(Integer classId) {
         return trainingClassMapper.getTrainingClass(classId);
     }
 
@@ -97,5 +103,37 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
             trainingClass.setClassBeginTime(LocalDateTime.from(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").parse(trainingClassVO.getClassBeginTimeStr())));
         }
         trainingClassMapper.updateClass(trainingClass);
+    }
+
+    @Override
+    public void signUp(TrainingSignUp trainingSignUp) {
+        TrainingClassVO trainingClass = trainingClassMapper.getTrainingClass(trainingSignUp.getClassId());
+        if (trainingClass.getSignUpCount() >= trainingClass.getMaxParticipantCount()) {
+            throw new RuntimeException("该课程已经满员，请选择其他课程报名");
+        }
+
+        trainingSignUp.setSignUpTime(LocalDateTime.now())
+                .setStatus(TrainingSignUpStatusEnum.SIGN_UP.getCode());
+        trainingSignUpMapper.addSignUp(trainingSignUp);
+    }
+
+    @Override
+    public void cancelSignUp(TrainingSignUp trainingSignUp) {
+        trainingSignUp.setCancelTime(LocalDateTime.now())
+                .setStatus(TrainingSignUpStatusEnum.NOT_SIGN_UP.getCode());
+        trainingSignUpMapper.updateSignUp(trainingSignUp);
+    }
+
+    @Override
+    public List<TrainingClassVO> selectSignUpList(TrainingClassVO trainingClassVO) {
+        if (StringUtils.isNotBlank(trainingClassVO.getClassName())) {
+            trainingClassVO.setClassName("%" + trainingClassVO.getClassName() + "%");
+        }
+        List<TrainingClassVO> list = trainingSignUpMapper.selectSignUpList(trainingClassVO);
+        for (TrainingClassVO classVO : list) {
+            // 默认未报名
+            classVO.setSignUpStatus(StringUtils.isNotBlank(classVO.getSignUpStatus()) ? classVO.getSignUpStatus() : TrainingSignUpStatusEnum.NOT_SIGN_UP.getCode());
+        }
+        return list;
     }
 }

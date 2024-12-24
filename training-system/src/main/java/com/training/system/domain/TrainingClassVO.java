@@ -101,6 +101,47 @@ public class TrainingClassVO implements Serializable {
     private String status;
 
     /**
+     * 最大报名人数
+     */
+    private Integer maxParticipantCount;
+
+    /**
+     * 报名id，主键
+     */
+    private Integer signUpId;
+
+    /**
+     * 人员id
+     */
+    private Integer peopleId;
+
+    /**
+     * 人员姓名
+     */
+    private String peopleName;
+
+    /**
+     * 报名状态
+     */
+    private String signUpStatus;
+
+    /**
+     * 报名时间
+     */
+    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+    private LocalDateTime signUpTime;
+
+    /**
+     * 取消报名时间
+     */
+    private LocalDateTime cancelTime;
+
+    /**
+     * 已报名人数
+     */
+    private Integer signUpCount;
+
+    /**
      * 查询条件开始时间
      */
     @JsonFormat(pattern = Constants.DATETIME_FORMAT)

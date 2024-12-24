@@ -31,7 +31,7 @@
  *
  * Copyright version 2.0
  */
-package com.training.system.service;
+package com.training.system.mapper;
 
 import com.training.common.core.domain.entity.TrainingSignUp;
 import com.training.system.domain.TrainingClassVO;
@@ -40,22 +40,12 @@ import java.util.List;
 
 /**
  * @author training
- * @date 2024.12.23
+ * @date 2024.12.24
  */
-public interface ITrainingClassService {
-    List<TrainingClassVO> selectClassList(TrainingClassVO trainingClassVO);
+public interface TrainingSignUpMapper {
+    void addSignUp(TrainingSignUp trainingSignUp);
 
-    void addClass(TrainingClassVO trainingClassVO);
-
-    void delClass(Integer classId);
-
-    TrainingClassVO getTrainingClass(Integer classId);
-
-    void updateClass(TrainingClassVO trainingClassVO);
-
-    void signUp(TrainingSignUp trainingSignUp);
-
-    void cancelSignUp(TrainingSignUp trainingSignUp);
+    void updateSignUp(TrainingSignUp trainingSignUp);
 
     List<TrainingClassVO> selectSignUpList(TrainingClassVO trainingClassVO);
 }
