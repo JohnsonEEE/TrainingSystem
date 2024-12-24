@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.training.system.mapper.TrainingSignUpMapper">
     <insert id="addSignUp" parameterType="com.training.common.core.domain.entity.TrainingSignUp">
-        insert into training_sign_up (people_id,people_name,class_id,status,sign_up_time,cancel_time)
+        insert into training_sign_up (people_id, people_name, class_id, status, sign_up_time, cancel_time)
         values (#{peopleId},
                 #{peopleName},
                 #{classId},
@@ -39,8 +39,14 @@
         b.sign_up_time AS signUpTime,
         (select count(*) from training_sign_up c where c.class_id = a.class_id and c.status = '1') AS signUpCount
         from training_class a
-        left join training_sign_up b on a.class_id = b.class_id and b.people_id = #{peopleId} and b.status = '1'
+        left join training_sign_up b on a.class_id = b.class_id and b.status = '1'
+        <if test="peopleId!=null and peopleId!=''">
+            and b.people_id = #{peopleId}
+        </if>
         <where>
+            <if test="classId!=null and classId!=''">
+                AND a.class_id = #{classId}
+            </if>
             <if test="className!=null and className!=''">
                 AND (lower(a.class_name) like lower(#{className})
                 OR lower(a.class_name_py) like lower(#{className}))

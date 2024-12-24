@@ -105,7 +105,7 @@
             >报名</el-button
           >
           <el-button
-            v-if="scope.row.signUpStatus == '1'"
+            v-if="scope.row.signUpStatus == '1' && scope.row.status == '0'"
             link
             style="color: red"
             type="primary"
@@ -198,7 +198,7 @@
   </div>
 </template>
 
-<script setup name="Class">
+<script setup name="SignUp">
 import {addClass, cancelSignUp, delClass, getClass, listSignUp, signUp, updateClass,} from "@/api/system/class";
 import useUserStore from "@/store/modules/user";
 

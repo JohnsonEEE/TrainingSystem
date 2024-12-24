@@ -60,7 +60,7 @@
       <el-table-column
         prop="className"
         label="课程名称"
-        width="200"
+        width="180"
       ></el-table-column>
       <el-table-column
         prop="teacherName"
@@ -77,14 +77,14 @@
       <el-table-column
         prop="location"
         label="上课地点"
-        width="180"
+        width="160"
       ></el-table-column>
       <el-table-column prop="classBeginTime" label="课程开始时间" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.classBeginTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="课程状态" width="100">
+      <el-table-column prop="status" label="课程状态" width="80">
         <template #default="scope">
           <dict-tag
             :options="training_class_status"
@@ -98,6 +98,14 @@
         class-name="small-padding fixed-width"
       >
         <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleSignUpList(scope.row)"
+            v-hasPermi="['system:dept:edit']"
+            >查看报名名单</el-button
+          >
           <el-button
             link
             type="primary"
@@ -232,11 +240,43 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 报名名单对话框 -->
+    <el-dialog
+      title="报名名单"
+      v-model="signUpOpen"
+      width="600px"
+      append-to-body
+    >
+      <el-table :data="signUpList" row-key="signUpId">
+        <el-table-column type="index" label="序号" width="50" />
+        <el-table-column
+          prop="className"
+          label="课程名称"
+          width="160"
+        ></el-table-column>
+        <el-table-column
+          prop="teacherName"
+          label="讲师"
+          width="80"
+        ></el-table-column>
+        <el-table-column
+          prop="peopleName"
+          label="员工姓名"
+          width="100"
+        ></el-table-column>
+        <el-table-column prop="signUpTime" label="报名时间" width="180">
+          <template #default="scope">
+            <span>{{ parseTime(scope.row.signUpTime) }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Class">
-import {addClass, delClass, getClass, listClass, updateClass,} from "@/api/system/class";
+import {addClass, delClass, getClass, listClass, listSignUp, updateClass,} from "@/api/system/class";
 
 const { proxy } = getCurrentInstance();
 const { training_class_status } = proxy.useDict("training_class_status");
@@ -250,7 +290,9 @@ const isExpandAll = ref(true);
 const refreshTable = ref(true);
 const status = ref("");
 const statusOpen = ref(false);
+const signUpOpen = ref(false);
 const currentClassId = ref(null);
+const signUpList = ref([]);
 
 const data = reactive({
   form: {},
@@ -405,6 +447,14 @@ function handleDelete(row) {
 /** 人数列格式化 */
 function countFormat(row, column) {
   return row.signUpCount + "/" + row.maxParticipantCount;
+}
+
+/** 查看报名名单 */
+function handleSignUpList(row) {
+  signUpOpen.value = true;
+  listSignUp({ classId: row.classId }).then((response) => {
+    signUpList.value = response.data;
+  });
 }
 
 getList();
