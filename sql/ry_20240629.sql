@@ -559,6 +559,7 @@ create table training_class (
                                 teacher_name varchar(100) default null comment '老师姓名',
                                 content text default null comment '课程内容',
                                 status varchar(100) default null comment '课程状态',
+                                progress int(3) default 0 comment '进度',
                                 max_participant_count int(8) default null comment '最多报名人数',
                                 primary key (class_id)
 ) engine=innodb auto_increment=100 comment = '培训课程表';
@@ -569,7 +570,7 @@ create table training_class (
 -- ----------------------------
 drop table if exists training_sign_up;
 create table training_sign_up(
-                                 sign_up_id int auto_increment comment '报名id，主键' ,
+                                 sign_up_id bigint(20) auto_increment comment '报名id，主键' ,
                                  people_id int(20) not null  comment '人员id' ,
                                  people_name varchar(32)   comment '人员姓名' ,
                                  class_id int(20) not null  comment '报名课程id' ,

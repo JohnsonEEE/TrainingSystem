@@ -5,7 +5,7 @@
 <mapper namespace="com.training.system.mapper.TrainingClassMapper">
     <insert id="addClass" parameterType="com.training.common.core.domain.entity.TrainingClass">
         insert into training_class (class_name, class_name_py, class_begin_time, location, teacher_name, content,
-                                    status, max_participant_count)
+                                    status, progress, max_participant_count)
         values (#{className},
                 #{classNamePY},
                 #{classBeginTime},
@@ -13,6 +13,7 @@
                 #{teacherName},
                 #{content},
                 #{status},
+                #{progress},
                 #{maxParticipantCount})
     </insert>
 
@@ -40,6 +41,9 @@
             <if test="status!=null">
                 status = #{status},
             </if>
+            <if test="progress!=null">
+                progress = #{progress},
+            </if>
             <if test="maxParticipantCount!=null">
                 max_participant_count = #{maxParticipantCount},
             </if>
@@ -58,7 +62,7 @@
             resultType="com.training.system.domain.TrainingClassVO">
         select a.class_id AS classId, a.class_name AS className, a.class_name_py AS classNamePy,
         a.class_begin_time AS classBeginTime, a.location, a.teacher_name AS teacherName, a.content, a.status,
-               a.max_participant_count AS maxParticipantCount,
+               a.max_participant_count AS maxParticipantCount, a.progress,
                (select count(*) from training_sign_up b where b.class_id = a.class_id and b.status = '1') AS signUpCount
         from training_class a
         <where>
@@ -70,7 +74,7 @@
                 AND a.class_begin_time <![CDATA[>=]]> #{queryBeginTime}
             </if>
             <if test="queryEndTime!=null">
-                AND a.class_begin_time <![CDATA[<=>]]> #{queryEndTime}
+                AND a.class_begin_time <![CDATA[<=]]> #{queryEndTime}
             </if>
             <if test="teacherName!=null and teacherName!=''">
                 AND lower(a.teacher_name) like lower(#{teacherName})
@@ -90,6 +94,7 @@
                a.teacher_name          AS teacherName,
                a.content,
                a.status,
+               a.progress,
                a.max_participant_count AS maxParticipantCount,
                (select count(*) from training_sign_up b where b.class_id = a.class_id and b.status = '1') AS signUpCount
         from training_class a

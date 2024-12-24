@@ -101,6 +101,11 @@ public class TrainingClassVO implements Serializable {
     private String status;
 
     /**
+     * 进度%
+     */
+    private Integer progress;
+
+    /**
      * 最大报名人数
      */
     private Integer maxParticipantCount;
@@ -156,12 +161,20 @@ public class TrainingClassVO implements Serializable {
     /**
      * 查询条件开始时间
      */
-    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+    private String queryBeginTimeStr;
+
+    /**
+     * 查询条件结束时间
+     */
+    private String queryEndTimeStr;
+
+    /**
+     * 查询条件开始时间
+     */
     private LocalDateTime queryBeginTime;
 
     /**
      * 查询条件结束时间
      */
-    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
     private LocalDateTime queryEndTime;
 }

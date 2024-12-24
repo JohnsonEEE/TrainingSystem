@@ -69,6 +69,12 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
         if (StringUtils.isNotBlank(trainingClassVO.getClassName())) {
             trainingClassVO.setClassName("%" + trainingClassVO.getClassName() + "%");
         }
+        if (StringUtils.isNotBlank(trainingClassVO.getQueryBeginTimeStr())) {
+            trainingClassVO.setQueryBeginTime(LocalDateTime.from(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").parse(trainingClassVO.getQueryBeginTimeStr() + " 00:00:00")));
+        }
+        if (StringUtils.isNotBlank(trainingClassVO.getQueryEndTimeStr())) {
+            trainingClassVO.setQueryEndTime(LocalDateTime.from(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").parse(trainingClassVO.getQueryEndTimeStr() + " 23:59:59")));
+        }
         return trainingClassMapper.selectClassList(trainingClassVO);
     }
 
@@ -136,6 +142,12 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
     public List<TrainingClassVO> selectSignUpList(TrainingClassVO trainingClassVO) {
         if (StringUtils.isNotBlank(trainingClassVO.getClassName())) {
             trainingClassVO.setClassName("%" + trainingClassVO.getClassName() + "%");
+        }
+        if (StringUtils.isNotBlank(trainingClassVO.getQueryBeginTimeStr())) {
+            trainingClassVO.setQueryBeginTime(LocalDateTime.from(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").parse(trainingClassVO.getQueryBeginTimeStr() + " 00:00:00")));
+        }
+        if (StringUtils.isNotBlank(trainingClassVO.getQueryEndTimeStr())) {
+            trainingClassVO.setQueryEndTime(LocalDateTime.from(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").parse(trainingClassVO.getQueryEndTimeStr() + " 23:59:59")));
         }
         List<TrainingClassVO> list = trainingSignUpMapper.selectSignUpList(trainingClassVO);
         for (TrainingClassVO classVO : list) {

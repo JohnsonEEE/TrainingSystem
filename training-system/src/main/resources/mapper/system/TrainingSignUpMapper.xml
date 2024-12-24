@@ -51,7 +51,7 @@
             resultType="com.training.system.domain.TrainingClassVO">
         select a.class_id AS classId, a.class_name AS className, a.class_name_py AS classNamePy,
         a.class_begin_time AS classBeginTime, a.location, a.teacher_name AS teacherName, a.content, a.status,
-        a.max_participant_count AS maxParticipantCount,
+        a.max_participant_count AS maxParticipantCount, a.progress,
         b.sign_up_id AS signUpId, b.people_id AS peopleId, b.people_name AS peopleName, b.status AS signUpStatus,
         b.sign_up_time AS signUpTime, b.check_time AS checkTime, b.complete_status AS completeStatus,
         (select count(*) from training_sign_up c where c.class_id = a.class_id and c.status = '1') AS signUpCount
@@ -72,7 +72,7 @@
                 AND a.class_begin_time <![CDATA[>=]]> #{queryBeginTime}
             </if>
             <if test="queryEndTime!=null">
-                AND a.class_begin_time <![CDATA[<=>]]> #{queryEndTime}
+                AND a.class_begin_time <![CDATA[<=]]> #{queryEndTime}
             </if>
             <if test="teacherName!=null and teacherName!=''">
                 AND lower(a.teacher_name) like lower(#{teacherName})

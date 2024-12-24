@@ -25,6 +25,17 @@
         </el-select>
       </el-form-item>
       <el-form-item>
+        <el-date-picker
+          v-model="queryTime"
+          type="daterange"
+          start-placeholder="Start date"
+          end-placeholder="End date"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+          date-format="YYYY-MM-DD"
+        />
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery"
           >搜索</el-button
         >
@@ -43,7 +54,7 @@
       <el-table-column
         prop="className"
         label="课程名称"
-        width="200"
+        width="140"
       ></el-table-column>
       <el-table-column
         prop="teacherName"
@@ -60,14 +71,19 @@
       <el-table-column
         prop="location"
         label="上课地点"
-        width="180"
+        width="100"
       ></el-table-column>
-      <el-table-column prop="classBeginTime" label="课程开始时间" width="180">
+      <el-table-column prop="progress" label="进度" width="80">
+        <template #default="scope">
+          <span>{{ scope.row.progress ? scope.row.progress : 0 }}%</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="classBeginTime" label="课程开始时间" width="160">
         <template #default="scope">
           <span>{{ parseTime(scope.row.classBeginTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="课程状态" width="100">
+      <el-table-column prop="status" label="课程状态" width="80">
         <template #default="scope">
           <dict-tag
             :options="training_class_status"
@@ -75,11 +91,19 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="signUpStatus" label="报名状态" width="100">
+      <el-table-column prop="signUpStatus" label="报名状态" width="80">
         <template #default="scope">
           <dict-tag
             :options="training_sign_up_status"
             :value="scope.row.signUpStatus"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column prop="completeStatus" label="完成状态" width="80">
+        <template #default="scope">
+          <dict-tag
+            :options="training_complete_status"
+            :value="scope.row.completeStatus"
           />
         </template>
       </el-table-column>
@@ -216,8 +240,10 @@ import useUserStore from "@/store/modules/user";
 const { proxy } = getCurrentInstance();
 const { training_class_status } = proxy.useDict("training_class_status");
 const { training_sign_up_status } = proxy.useDict("training_sign_up_status");
+const { training_complete_status } = proxy.useDict("training_complete_status");
 
 const classList = ref([]);
+const queryTime = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -247,6 +273,13 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询课程列表 */
 function getList() {
   loading.value = true;
+  if (queryTime.value && queryTime.value.length > 1) {
+    queryParams.value.queryBeginTimeStr = queryTime.value[0];
+    queryParams.value.queryEndTimeStr = queryTime.value[1];
+  } else {
+    queryParams.value.queryBeginTimeStr = null;
+    queryParams.value.queryEndTimeStr = null;
+  }
   listSignUp(queryParams.value).then((response) => {
     classList.value = response.data;
     loading.value = false;

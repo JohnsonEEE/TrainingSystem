@@ -97,6 +97,11 @@ public class TrainingClass {
     private String status;
 
     /**
+     * 进度%
+     */
+    private Integer progress;
+
+    /**
      * 最大报名人数
      */
     private Integer maxParticipantCount;

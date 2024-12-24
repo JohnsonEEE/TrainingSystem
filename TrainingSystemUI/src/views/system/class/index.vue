@@ -25,6 +25,17 @@
         </el-select>
       </el-form-item>
       <el-form-item>
+        <el-date-picker
+          v-model="queryTime"
+          type="daterange"
+          start-placeholder="Start date"
+          end-placeholder="End date"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+          date-format="YYYY-MM-DD"
+        />
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery"
           >搜索</el-button
         >
@@ -60,7 +71,7 @@
       <el-table-column
         prop="className"
         label="课程名称"
-        width="180"
+        width="150"
       ></el-table-column>
       <el-table-column
         prop="teacherName"
@@ -77,8 +88,13 @@
       <el-table-column
         prop="location"
         label="上课地点"
-        width="160"
+        width="130"
       ></el-table-column>
+      <el-table-column prop="progress" label="进度" width="80">
+        <template #default="scope">
+          <span>{{ scope.row.progress ? scope.row.progress : 0 }}%</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="classBeginTime" label="课程开始时间" width="180">
         <template #default="scope">
           <span>{{ parseTime(scope.row.classBeginTime) }}</span>
@@ -104,7 +120,7 @@
             icon="Edit"
             @click="handleSignUpList(scope.row)"
             v-hasPermi="['system:dept:edit']"
-            >查看报名名单</el-button
+            >查看名单</el-button
           >
           <el-button
             link
@@ -231,6 +247,11 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="22">
+            <el-form-item label="进度" prop="progress">
+              <el-slider v-model="progress" />
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <template #footer>
@@ -248,6 +269,14 @@
       width="840px"
       append-to-body
     >
+      <el-row style="margin-bottom: 10px">
+        <el-col :span="6">总报名人数：{{ signUpCount }}</el-col>
+        <el-col :span="6">签到人数：{{ checkCount }}</el-col>
+        <el-col :span="6">完成人数：{{ completeCount }}</el-col>
+        <el-col :span="6" style="color: red"
+          >未完成人数：{{ notCompleteCount }}</el-col
+        >
+      </el-row>
       <el-table :data="signUpList" row-key="signUpId">
         <el-table-column type="index" label="序号" width="50" />
         <el-table-column
@@ -324,6 +353,7 @@ const { training_sign_up_status } = proxy.useDict("training_sign_up_status");
 const { training_complete_status } = proxy.useDict("training_complete_status");
 
 const classList = ref([]);
+const queryTime = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -331,11 +361,13 @@ const title = ref("");
 const isExpandAll = ref(true);
 const refreshTable = ref(true);
 const status = ref("");
+const progress = ref(0);
 const statusOpen = ref(false);
 const signUpOpen = ref(false);
 const currentClassId = ref(null);
 const signUpList = ref([]);
 const checkCount = ref(0);
+const signUpCount = ref(0);
 const completeCount = ref(0);
 const notCompleteCount = ref(0);
 
@@ -373,6 +405,13 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询课程列表 */
 function getList() {
   loading.value = true;
+  if (queryTime.value && queryTime.value.length > 1) {
+    queryParams.value.queryBeginTimeStr = queryTime.value[0];
+    queryParams.value.queryEndTimeStr = queryTime.value[1];
+  } else {
+    queryParams.value.queryBeginTimeStr = null;
+    queryParams.value.queryEndTimeStr = null;
+  }
   listClass(queryParams.value).then((response) => {
     classList.value = response.data;
     loading.value = false;
@@ -443,14 +482,16 @@ function handleUpdateStatus(row) {
 
 /** 修改状态 */
 function changeStatus() {
-  updateClass({ classId: currentClassId.value, status: status.value }).then(
-    () => {
-      statusOpen.value = false;
-      proxy.$modal.msgSuccess("修改成功");
-      open.value = false;
-      getList();
-    }
-  );
+  updateClass({
+    classId: currentClassId.value,
+    status: status.value,
+    progress: progress.value,
+  }).then(() => {
+    statusOpen.value = false;
+    proxy.$modal.msgSuccess("修改成功");
+    open.value = false;
+    getList();
+  });
 }
 
 /** 提交按钮 */
@@ -499,15 +540,19 @@ function handleSignUpList(row) {
   signUpOpen.value = true;
   listSignUp({ classId: row.classId }).then((response) => {
     signUpList.value = response.data.filter((t) => t.signUpId);
+    signUpCount.value = signUpList.value.length;
     checkCount.value = 0;
     completeCount.value = 0;
     notCompleteCount.value = 0;
     for (let i = 0; i <= signUpList.value.length; i++) {
       const signUp = signUpList.value[i];
-      if (signUp.signUpStatus === "3") {
+      if (signUp.completeStatus === "1") {
         completeCount.value = completeCount.value + 1;
       } else {
         notCompleteCount.value = notCompleteCount.value + 1;
+      }
+      if (signUp.signUpStatus === "2") {
+        checkCount.value = checkCount.value + 1;
       }
     }
   });
