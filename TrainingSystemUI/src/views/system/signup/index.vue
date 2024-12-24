@@ -140,7 +140,7 @@
             >报名</el-button
           >
           <el-button
-            v-if="scope.row.signUpStatus == '1' && scope.row.status == '0'"
+            v-if="scope.row.signUpStatus == '1'"
             link
             style="color: red"
             type="primary"
