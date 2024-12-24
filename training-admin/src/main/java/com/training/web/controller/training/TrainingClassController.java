@@ -95,6 +95,12 @@ public class TrainingClassController extends BaseController {
         }
     }
 
+    @RequestMapping("/check")
+    public AjaxResult check(TrainingSignUp trainingSignUp) {
+        trainingClassService.check(trainingSignUp);
+        return AjaxResult.success();
+    }
+
     @RequestMapping("/cancelSignUp")
     public AjaxResult cancelSignUp(TrainingSignUp trainingSignUp) {
         trainingClassService.cancelSignUp(trainingSignUp);
@@ -104,5 +110,11 @@ public class TrainingClassController extends BaseController {
     @RequestMapping("/signList")
     public AjaxResult signList(TrainingClassVO trainingClassVO) {
         return AjaxResult.success(trainingClassService.selectSignUpList(trainingClassVO));
+    }
+
+    @RequestMapping("/complete")
+    public AjaxResult complete(TrainingSignUp trainingSignUp) {
+        trainingClassService.complete(trainingSignUp);
+        return AjaxResult.success();
     }
 }

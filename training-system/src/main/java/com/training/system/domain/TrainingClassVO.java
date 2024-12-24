@@ -126,6 +126,11 @@ public class TrainingClassVO implements Serializable {
     private String signUpStatus;
 
     /**
+     * 完成状态
+     */
+    private String completeStatus;
+
+    /**
      * 报名时间
      */
     @JsonFormat(pattern = Constants.DATETIME_FORMAT)
@@ -134,7 +139,14 @@ public class TrainingClassVO implements Serializable {
     /**
      * 取消报名时间
      */
+    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
     private LocalDateTime cancelTime;
+
+    /**
+     * 签到时间
+     */
+    @JsonFormat(pattern = Constants.DATETIME_FORMAT)
+    private LocalDateTime checkTime;
 
     /**
      * 已报名人数

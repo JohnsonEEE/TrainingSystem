@@ -97,6 +97,17 @@
             >查看详情</el-button
           >
           <el-button
+            v-if="
+              scope.row.signUpStatus == '1' &&
+              (scope.row.status == '0' || scope.row.status == '1')
+            "
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleCheck(scope.row)"
+            >签到</el-button
+          >
+          <el-button
             v-if="scope.row.signUpStatus == '0'"
             link
             type="primary"
@@ -199,7 +210,7 @@
 </template>
 
 <script setup name="SignUp">
-import {addClass, cancelSignUp, delClass, getClass, listSignUp, signUp, updateClass,} from "@/api/system/class";
+import {addClass, cancelSignUp, check, delClass, getClass, listSignUp, signUp, updateClass,} from "@/api/system/class";
 import useUserStore from "@/store/modules/user";
 
 const { proxy } = getCurrentInstance();
@@ -370,14 +381,29 @@ function handleSignUp(row) {
     .catch(() => {});
 }
 
+/** 签到 */
+function handleCheck(row) {
+  proxy.$modal
+    .confirm('是否确认签到课程【"' + row.className + '"】?')
+    .then(function () {
+      return check({
+        signUpId: row.signUpId,
+      });
+    })
+    .then(() => {
+      getList();
+      proxy.$modal.msgSuccess("签到成功");
+    })
+    .catch(() => {});
+}
+
 /** 取消报名 */
 function handleCancelSignUp(row) {
   proxy.$modal
     .confirm('是否确认取消报名课程【"' + row.className + '"】?')
     .then(function () {
       return cancelSignUp({
-        classId: row.classId,
-        peopleId: userStore.id,
+        signUpId: row.signUpId,
       });
     })
     .then(() => {

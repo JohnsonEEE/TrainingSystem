@@ -113,8 +113,16 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
         }
 
         trainingSignUp.setSignUpTime(LocalDateTime.now())
-                .setStatus(TrainingSignUpStatusEnum.SIGN_UP.getCode());
+                .setStatus(TrainingSignUpStatusEnum.SIGN_UP.getCode())
+                .setCompleteStatus("0");
         trainingSignUpMapper.addSignUp(trainingSignUp);
+    }
+
+    @Override
+    public void check(TrainingSignUp trainingSignUp) {
+        trainingSignUp.setStatus(TrainingSignUpStatusEnum.CHECK.getCode())
+                .setCheckTime(LocalDateTime.now());
+        trainingSignUpMapper.updateSignUp(trainingSignUp);
     }
 
     @Override
@@ -135,5 +143,13 @@ public class TrainingClassServiceImpl implements ITrainingClassService {
             classVO.setSignUpStatus(StringUtils.isNotBlank(classVO.getSignUpStatus()) ? classVO.getSignUpStatus() : TrainingSignUpStatusEnum.NOT_SIGN_UP.getCode());
         }
         return list;
+    }
+
+    @Override
+    public void complete(TrainingSignUp trainingSignUp) {
+        TrainingSignUp update = new TrainingSignUp()
+                .setSignUpId(trainingSignUp.getSignUpId())
+                .setCompleteStatus("1".equals(trainingSignUp.getCompleteStatus()) ? "1" : "0");
+        trainingSignUpMapper.updateSignUp(update);
     }
 }

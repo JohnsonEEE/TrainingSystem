@@ -46,7 +46,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TrainingSignUpStatusEnum {
     NOT_SIGN_UP("0", "未报名"),
-    SIGN_UP("1", "已报名");
+    SIGN_UP("1", "已报名"),
+    CHECK("2", "已签到");
 
     /**
      * 编码

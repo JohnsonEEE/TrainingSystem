@@ -54,6 +54,24 @@ export function signUp(trainingSignUp) {
   })
 }
 
+// 签到
+export function check(trainingSignUp) {
+  return request({
+    url: '/training/check',
+    method: 'post',
+    params: trainingSignUp
+  })
+}
+
+// 完成
+export function complete(trainingSignUp) {
+  return request({
+    url: '/training/complete',
+    method: 'post',
+    params: trainingSignUp
+  })
+}
+
 // 取消报名课程
 export function cancelSignUp(trainingSignUp) {
   return request({

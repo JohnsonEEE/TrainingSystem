@@ -55,7 +55,11 @@ public interface ITrainingClassService {
 
     void signUp(TrainingSignUp trainingSignUp);
 
+    void check(TrainingSignUp trainingSignUp);
+
     void cancelSignUp(TrainingSignUp trainingSignUp);
 
     List<TrainingClassVO> selectSignUpList(TrainingClassVO trainingClassVO);
+
+    void complete(TrainingSignUp trainingSignUp);
 }

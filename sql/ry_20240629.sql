@@ -574,8 +574,10 @@ create table training_sign_up(
                                  people_name varchar(32)   comment '人员姓名' ,
                                  class_id int(20) not null  comment '报名课程id' ,
                                  status varchar(8) not null  comment '报名状态' ,
+                                 complete_status varchar(8) not null  comment '完成状态' ,
                                  sign_up_time datetime   comment '报名时间' ,
                                  cancel_time datetime   comment '报名时间' ,
+                                 check_time datetime comment '签到时间',
                                  primary key (sign_up_id)
 )  comment = '培训报名表';
 

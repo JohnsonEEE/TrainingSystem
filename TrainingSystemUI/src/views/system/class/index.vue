@@ -245,7 +245,7 @@
     <el-dialog
       title="报名名单"
       v-model="signUpOpen"
-      width="600px"
+      width="840px"
       append-to-body
     >
       <el-table :data="signUpList" row-key="signUpId">
@@ -265,9 +265,49 @@
           label="员工姓名"
           width="100"
         ></el-table-column>
-        <el-table-column prop="signUpTime" label="报名时间" width="180">
+        <el-table-column prop="signUpStatus" label="报名状态" width="100">
           <template #default="scope">
-            <span>{{ parseTime(scope.row.signUpTime) }}</span>
+            <dict-tag
+              :options="training_sign_up_status"
+              :value="scope.row.signUpStatus"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="completeStatus" label="完成状态" width="100">
+          <template #default="scope">
+            <dict-tag
+              :options="training_complete_status"
+              :value="scope.row.completeStatus"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          align="center"
+          class-name="small-padding fixed-width"
+        >
+          <template #default="scope">
+            <el-button
+              v-if="
+                scope.row.completeStatus === '0' ||
+                scope.row.completeStatus === '' ||
+                !scope.row.completeStatus
+              "
+              link
+              type="primary"
+              icon="Edit"
+              @click="handleComplete(scope.row, true)"
+              >完成课程</el-button
+            >
+            <el-button
+              v-if="scope.row.completeStatus === '1'"
+              link
+              type="primary"
+              icon="Edit"
+              style="color: red"
+              @click="handleComplete(scope.row, false)"
+              >取消完成课程</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -276,10 +316,12 @@
 </template>
 
 <script setup name="Class">
-import {addClass, delClass, getClass, listClass, listSignUp, updateClass,} from "@/api/system/class";
+import {addClass, complete, delClass, getClass, listClass, listSignUp, updateClass,} from "@/api/system/class";
 
 const { proxy } = getCurrentInstance();
 const { training_class_status } = proxy.useDict("training_class_status");
+const { training_sign_up_status } = proxy.useDict("training_sign_up_status");
+const { training_complete_status } = proxy.useDict("training_complete_status");
 
 const classList = ref([]);
 const open = ref(false);
@@ -293,6 +335,9 @@ const statusOpen = ref(false);
 const signUpOpen = ref(false);
 const currentClassId = ref(null);
 const signUpList = ref([]);
+const checkCount = ref(0);
+const completeCount = ref(0);
+const notCompleteCount = ref(0);
 
 const data = reactive({
   form: {},
@@ -453,8 +498,36 @@ function countFormat(row, column) {
 function handleSignUpList(row) {
   signUpOpen.value = true;
   listSignUp({ classId: row.classId }).then((response) => {
-    signUpList.value = response.data;
+    signUpList.value = response.data.filter((t) => t.signUpId);
+    checkCount.value = 0;
+    completeCount.value = 0;
+    notCompleteCount.value = 0;
+    for (let i = 0; i <= signUpList.value.length; i++) {
+      const signUp = signUpList.value[i];
+      if (signUp.signUpStatus === "3") {
+        completeCount.value = completeCount.value + 1;
+      } else {
+        notCompleteCount.value = notCompleteCount.value + 1;
+      }
+    }
   });
+}
+
+/** 完成/取消完成课程 */
+function handleComplete(row, isComplete) {
+  proxy.$modal
+    .confirm('是否确认完成课程【"' + row.className + '"】?')
+    .then(function () {
+      return complete({
+        signUpId: row.signUpId,
+        completeStatus: isComplete ? "1" : "0",
+      });
+    })
+    .then(() => {
+      handleSignUpList(row);
+      proxy.$modal.msgSuccess("完成成功");
+    })
+    .catch(() => {});
 }
 
 getList();

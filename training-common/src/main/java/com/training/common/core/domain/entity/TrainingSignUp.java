@@ -61,8 +61,14 @@ public class TrainingSignUp implements Serializable {
     private Integer classId;
     /** 报名状态 */
     private String status;
+    /** 完成状态, 1:已完成,0:未完成 */
+    private String completeStatus;
     /** 报名时间 */
     private LocalDateTime signUpTime;
     /** 取消报名时间 */
     private LocalDateTime cancelTime;
+    /**
+     * 签到时间
+     */
+    private LocalDateTime checkTime;
 }

@@ -4,11 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.training.system.mapper.TrainingSignUpMapper">
     <insert id="addSignUp" parameterType="com.training.common.core.domain.entity.TrainingSignUp">
-        insert into training_sign_up (people_id, people_name, class_id, status, sign_up_time, cancel_time)
+        insert into training_sign_up (people_id, people_name, class_id, status, complete_status, sign_up_time, cancel_time)
         values (#{peopleId},
                 #{peopleName},
                 #{classId},
                 #{status},
+                #{completeStatus},
                 #{signUpTime},
                 #{cancelTime})
     </insert>
@@ -19,14 +20,30 @@
             <if test="status!=null">
                 status = #{status},
             </if>
+            <if test="completeStatus!=null">
+                complete_status = #{completeStatus},
+            </if>
             <if test="signUpTime!=null">
                 sign_up_time = #{signUpTime},
             </if>
             <if test="cancelTime!=null">
                 cancel_time = #{cancelTime},
             </if>
+            <if test="checkTime!=null">
+                check_time = #{checkTime},
+            </if>
         </set>
-        where people_id = #{peopleId} and class_id = #{classId}
+        <where>
+            <if test="peopleId !=null">
+                and people_id = #{peopleId}
+            </if>
+            <if test="classId !=null">
+                and class_id = #{classId}
+            </if>
+            <if test="signUpId !=null">
+                and sign_up_id = #{signUpId}
+            </if>
+        </where>
     </update>
 
     <select id="selectSignUpList"
@@ -36,10 +53,10 @@
         a.class_begin_time AS classBeginTime, a.location, a.teacher_name AS teacherName, a.content, a.status,
         a.max_participant_count AS maxParticipantCount,
         b.sign_up_id AS signUpId, b.people_id AS peopleId, b.people_name AS peopleName, b.status AS signUpStatus,
-        b.sign_up_time AS signUpTime,
+        b.sign_up_time AS signUpTime, b.check_time AS checkTime, b.complete_status AS completeStatus,
         (select count(*) from training_sign_up c where c.class_id = a.class_id and c.status = '1') AS signUpCount
         from training_class a
-        left join training_sign_up b on a.class_id = b.class_id and b.status = '1'
+        left join training_sign_up b on a.class_id = b.class_id and b.status IN ('1','2')
         <if test="peopleId!=null and peopleId!=''">
             and b.people_id = #{peopleId}
         </if>
